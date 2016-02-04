@@ -1,0 +1,28 @@
+html, body, main {
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	flex: 1;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+}
+.example-grid {
+	flex: 1;
+	font-family: Arial;
+}
+.example-content {
+	margin: 16px;
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.example-controls {
+	display: flex;
+}
+.example-control {
+	flex: 1;
+	margin: 0.5em;
+	font-family: inherit;
+}
