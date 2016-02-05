@@ -58,4 +58,6 @@ Pass in the list of `gridItems` to the `RMGrid` component and it'll automaticall
 
 You can specify the number of `gridRows` and `gridColumns` to use for rendering the grid. If you have more or fewer items in your list than can fit in the grid, those items will be ignored.
 
+You can set `gridRows` to `"scroll"` to have it automatically scroll vertically for you while maintaining the same number of columns.
+
 You can also specify a `gridClass` to apply on the grid's container if you want to add additional styles to it. Try not to mess with flexbox/padding settings since that can mess up the layout.
