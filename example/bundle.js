@@ -8,7 +8,7 @@ window.Ractive = Ractive;
 
 console.log("Ractive components", Ractive.components);
 
-var template = "<RMGrid class=\"example-grid\" gridItems=\"{{items}}\" gridRows=\"{{rows}}\" gridColumns=\"{{columns}}\">\n\t<div class=\"example-content\">\n\t\t{{name}}\n\t</div>\n</RMGrid>\n<div class=\"example-controls\">\n\t<input value=\"{{rows}}\" type=\"number\" class=\"example-control\" />\n\t<input value=\"{{columns}}\" type=\"number\" class=\"example-control\" />\n</div>\r\n";
+var template = "<RMGrid class=\"example-grid\" gridItems=\"{{items}}\" gridRows=\"{{rows}}\" gridColumns=\"{{columns}}\">\r\n\t<div class=\"example-content\">\r\n\t\t{{name}}\r\n\t</div>\r\n</RMGrid>\r\n<div class=\"example-controls\">\r\n\t<input value=\"{{rows}}\" type=\"number\" class=\"example-control\" />\r\n\t<input value=\"{{columns}}\" type=\"number\" class=\"example-control\" />\r\n</div>\r\n";
 
 new Ractive({
 	el: document.querySelector("main"),
@@ -78,8 +78,8 @@ var Ractive = require("ractive");
 var getSize = require("bounding-client-rect");
 var debounce = require("debounce");
 
-var template = "<div class=\"rm-grid-container {{class}}\">\n\t{{#gridItems: gridItemIndex}}\n\t\t{{#if gridItemIndex < gridRows*gridColumns}}\n\t\t\t<div class=\"rm-grid-item\" style=\"width: {{gridSize}}; height: {{gridSize}}; margin: {{gridMarginY}} {{gridMarginX}};\">\r\n\t\t\t\t{{>content}}\n\t\t\t</div>\n\t\t{{/if}}\n\t{{/gridItems}}\r\n</div>\r\n";
-var style = ".rm-grid-container {\n\tdisplay: -webkit-box;\n\tdisplay: -webkit-flex;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\t-webkit-flex-wrap: wrap;\n\t-ms-flex-wrap: wrap;\n\tflex-wrap: wrap;\n}\n.rm-grid-item {\n\tdisplay: -webkit-box;\n\tdisplay: -webkit-flex;\n\tdisplay: -ms-flexbox;\n\tdisplay: flex;\n\t-webkit-box-align: stretch;\n\t-webkit-align-items: stretch;\n\t-ms-flex-align: stretch;\n\talign-items: stretch;\n\t-webkit-box-pack: center;\n\t-webkit-justify-content: center;\n\t-ms-flex-pack: center;\n\tjustify-content: center;\n}\n.rm-grid-item > * {\n\t-webkit-box-flex: 1;\n\t-webkit-flex: 1;\n\t-ms-flex: 1;\n\tflex: 1;\n}\n";
+var template = "<div class=\"rm-grid-container {{class}}\">\r\n\t{{#gridItems: gridItemIndex}}\r\n\t\t{{#if gridItemIndex < gridRows*gridColumns}}\r\n\t\t\t<div class=\"rm-grid-item\" style=\"width: {{gridSize}}; height: {{gridSize}}; margin: {{gridMarginY}} {{gridMarginX}};\">\r\n\t\t\t\t{{>content}}\r\n\t\t\t</div>\r\n\t\t{{/if}}\r\n\t{{/gridItems}}\r\n</div>\r\n";
+var style = ".rm-grid-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-flex-wrap: wrap;\r\n\t-ms-flex-wrap: wrap;\r\n\tflex-wrap: wrap;\r\n}\r\n.rm-grid-item {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-box-align: stretch;\r\n\t-webkit-align-items: stretch;\r\n\t-ms-flex-align: stretch;\r\n\talign-items: stretch;\r\n\t-webkit-box-pack: center;\r\n\t-webkit-justify-content: center;\r\n\t-ms-flex-pack: center;\r\n\tjustify-content: center;\r\n}\r\n.rm-grid-item > * {\r\n\t-webkit-box-flex: 1;\r\n\t-webkit-flex: 1;\r\n\t-ms-flex: 1;\r\n\tflex: 1;\r\n}\r\n";
 
 insert(style);
 
