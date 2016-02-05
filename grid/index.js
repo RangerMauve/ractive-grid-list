@@ -97,4 +97,5 @@ function listenResize(component) {
 	component.observe("gridRows", listener);
 	component.observe("gridColumns", listener);
 	component.observe("gridClass", listener);
+	component.observe("gridItems", listener);
 }
