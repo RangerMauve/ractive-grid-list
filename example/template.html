@@ -1,9 +1,15 @@
-<RMGrid class="example-grid" gridItems="{{items}}" gridRows="{{rows}}" gridColumns="{{columns}}">
+<RMGrid class="example-grid" gridItems="{{items}}" gridRows="{{scrolling ? 'scroll' : rows}}" gridColumns="{{columns}}">
 	<div class="example-content">
 		{{name}}
 	</div>
 </RMGrid>
 <div class="example-controls">
-	<input value="{{rows}}" type="number" class="example-control" />
+	{{#if !scrolling}}
+		<input value="{{rows}}" type="number" class="example-control" />
+	{{/if}}
 	<input value="{{columns}}" type="number" class="example-control" />
+	<label class="example-control">
+		<input type="checkbox" checked="{{scrolling}}" />
+		Scroll
+	</label>
 </div>

@@ -15,6 +15,7 @@ new Ractive({
 	data: {
 		rows: 3,
 		columns: 3,
+		scrolling: false,
 		items: [{
 			name: "Alice"
 		}, {

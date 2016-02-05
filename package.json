@@ -29,7 +29,8 @@
     "brfs": "^1.4.3",
     "debounce": "^1.0.0",
     "insert-css": "^0.2.0",
-    "ractive": "^0.6.1"
+    "ractive": "^0.6.1",
+    "scrollbar-width": "^3.1.1"
   },
   "devDependencies": {
     "browserify": "^13.0.0",
