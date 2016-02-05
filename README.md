@@ -1,6 +1,8 @@
 # ractive-grid-list
 A ractive component for displaying a grid of squares from an arbitrary list. Shows just the number of rows and columns as are specified and guarantees the items to be square and evenly distributed upon resizing.
 
+[Live Demo](http://rangermauve.github.io/ractive-grid-list/example/)
+
 ## Installing
 Works with [browserify](http://browserify.org/). You can build a [standalone](http://www.forbeslindesay.co.uk/post/46324645400/standalone-browserify-builds) bundle yourself if that's something that's needed.
 

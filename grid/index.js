@@ -5,6 +5,7 @@ var insert = require("insert-css");
 var Ractive = require("ractive");
 
 var getSize = require("bounding-client-rect");
+var getScrollbarWidth = require("scrollbar-width");
 var debounce = require("debounce");
 
 var template = fs.readFileSync(__dirname + "/template.html", "utf8");
@@ -31,27 +32,51 @@ module.exports = Ractive.extend({
 });
 
 function recalculate() {
-	var size = getSize(this.find(".rm-grid-container"));
-	var itemWidth = size.width / +(this.get("gridColumns"));
-	var itemHeight = size.height / +(this.get("gridRows"));
-	var padding = "0px";
+	// Get raw information about the state
+	var container = this.find(".rm-grid-container");
+	var size = getSize(container);
+	var gridRows = this.get("gridRows");
+	var gridColumns = this.get("gridColumns");
+	var isScrolling = gridRows === "scroll";
 
-	if (itemWidth > itemHeight) {
-		// Will pad on the sides
-		padding = (itemWidth - itemHeight) / 2;
+	// Get certain dimensions
+	var containerWidth = size.width;
+	var containerHeight = size.height;
+	var itemWidth = containerWidth / +(gridColumns);
+	var itemHeight = containerHeight / +(gridRows);
+
+	if (isScrolling) {
+		// Calculate for vertical scrolling
+		var hasScrollbar = container.scrollHeight > container.clientHeight;
+		var gridSize = itemWidth;
+		if (hasScrollbar)
+			gridSize = itemWidth - (getScrollbarWidth() / gridColumns);
+
 		this.set({
-			gridSize: itemHeight + "px",
-			gridMarginY: "0px",
-			gridMarginX: padding + "px"
+			gridSize: gridSize + "px",
+			gridMarginX: "0px",
+			gridMarginY: "0px"
 		});
 	} else {
-		// Will pad on top/bottom
-		padding = (itemHeight - itemWidth) / 2;
-		this.set({
-			gridSize: itemWidth + "px",
-			gridMarginY: padding + "px",
-			gridMarginX: "0px"
-		});
+		// Calculate for fitting perfectly
+		var padding = "0px";
+		if (gridRows === "scroll") {} else if (itemWidth > itemHeight) {
+			// Will pad on the sides
+			padding = (itemWidth - itemHeight) / 2;
+			this.set({
+				gridSize: itemHeight + "px",
+				gridMarginY: "0px",
+				gridMarginX: padding + "px"
+			});
+		} else {
+			// Will pad on top/bottom
+			padding = (itemHeight - itemWidth) / 2;
+			this.set({
+				gridSize: itemWidth + "px",
+				gridMarginY: padding + "px",
+				gridMarginX: "0px"
+			});
+		}
 	}
 }
 

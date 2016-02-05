@@ -1,6 +1,6 @@
 <div class="rm-grid-container {{class}}">
 	{{#gridItems: gridItemIndex}}
-		{{#if gridItemIndex < gridRows*gridColumns}}
+		{{#if gridItemIndex < gridRows*gridColumns || gridRows === "scroll"}}
 			<div class="rm-grid-item" style="width: {{gridSize}}; height: {{gridSize}}; margin: {{gridMarginY}} {{gridMarginX}};">
 				{{>content}}
 			</div>
