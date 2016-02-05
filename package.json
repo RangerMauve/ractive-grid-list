@@ -1,6 +1,6 @@
 {
   "name": "ractive-grid-list",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A ractive component for displaying a grid of squares from an arbitrary list",
   "main": "index.js",
   "scripts": {
