@@ -6,6 +6,7 @@ var Ractive = require("ractive");
 
 var getSize = require("bounding-client-rect");
 var getScrollbarWidth = require("scrollbar-width");
+var hasScrollbar = require("has-scrollbar");
 var debounce = require("debounce");
 
 var template = fs.readFileSync(__dirname + "/template.html", "utf8");
@@ -47,9 +48,8 @@ function recalculate() {
 
 	if (isScrolling) {
 		// Calculate for vertical scrolling
-		var hasScrollbar = container.scrollHeight > container.clientHeight;
 		var gridSize = itemWidth;
-		if (hasScrollbar)
+		if (hasScrollbar(container))
 			gridSize = itemWidth - (getScrollbarWidth() / gridColumns);
 
 		this.set({

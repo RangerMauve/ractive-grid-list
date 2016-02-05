@@ -28,6 +28,7 @@
     "bounding-client-rect": "^1.0.5",
     "brfs": "^1.4.3",
     "debounce": "^1.0.0",
+    "has-scrollbar": "^1.0.0",
     "insert-css": "^0.2.0",
     "ractive": "^0.6.1",
     "scrollbar-width": "^3.1.1"
