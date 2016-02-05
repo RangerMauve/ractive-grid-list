@@ -8,7 +8,7 @@ window.Ractive = Ractive;
 
 console.log("Ractive components", Ractive.components);
 
-var template = "<RMGrid class=\"example-grid\" gridItems=\"{{items}}\" gridRows=\"{{rows}}\" gridColumns=\"{{columns}}\">\r\n\t<div class=\"example-content\">\r\n\t\t{{name}}\r\n\t</div>\r\n</RMGrid>\r\n<div class=\"example-controls\">\r\n\t<input value=\"{{rows}}\" type=\"number\" class=\"example-control\" />\r\n\t<input value=\"{{columns}}\" type=\"number\" class=\"example-control\" />\r\n</div>\r\n";
+var template = "<RMGrid class=\"example-grid\" gridItems=\"{{items}}\" gridRows=\"{{scrolling ? 'scroll' : rows}}\" gridColumns=\"{{columns}}\">\r\n\t<div class=\"example-content\">\r\n\t\t{{name}}\r\n\t</div>\r\n</RMGrid>\r\n<div class=\"example-controls\">\r\n\t{{#if !scrolling}}\r\n\t\t<input value=\"{{rows}}\" type=\"number\" class=\"example-control\" />\r\n\t{{/if}}\r\n\t<input value=\"{{columns}}\" type=\"number\" class=\"example-control\" />\r\n\t<label class=\"example-control\">\r\n\t\t<input type=\"checkbox\" checked=\"{{scrolling}}\" />\r\n\t\tScroll\r\n\t</label>\r\n</div>\r\n";
 
 new Ractive({
 	el: document.querySelector("main"),
@@ -16,6 +16,7 @@ new Ractive({
 	data: {
 		rows: 3,
 		columns: 3,
+		scrolling: false,
 		items: [{
 			name: "Alice"
 		}, {
@@ -76,10 +77,11 @@ var insert = require("insert-css");
 var Ractive = require("ractive");
 
 var getSize = require("bounding-client-rect");
+var getScrollbarWidth = require("scrollbar-width");
 var debounce = require("debounce");
 
-var template = "<div class=\"rm-grid-container {{class}}\">\r\n\t{{#gridItems: gridItemIndex}}\r\n\t\t{{#if gridItemIndex < gridRows*gridColumns}}\r\n\t\t\t<div class=\"rm-grid-item\" style=\"width: {{gridSize}}; height: {{gridSize}}; margin: {{gridMarginY}} {{gridMarginX}};\">\r\n\t\t\t\t{{>content}}\r\n\t\t\t</div>\r\n\t\t{{/if}}\r\n\t{{/gridItems}}\r\n</div>\r\n";
-var style = ".rm-grid-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-flex-wrap: wrap;\r\n\t-ms-flex-wrap: wrap;\r\n\tflex-wrap: wrap;\r\n}\r\n.rm-grid-item {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-box-align: stretch;\r\n\t-webkit-align-items: stretch;\r\n\t-ms-flex-align: stretch;\r\n\talign-items: stretch;\r\n\t-webkit-box-pack: center;\r\n\t-webkit-justify-content: center;\r\n\t-ms-flex-pack: center;\r\n\tjustify-content: center;\r\n}\r\n.rm-grid-item > * {\r\n\t-webkit-box-flex: 1;\r\n\t-webkit-flex: 1;\r\n\t-ms-flex: 1;\r\n\tflex: 1;\r\n}\r\n";
+var template = "<div class=\"rm-grid-container {{class}}\">\r\n\t{{#gridItems: gridItemIndex}}\r\n\t\t{{#if gridItemIndex < gridRows*gridColumns || gridRows === \"scroll\"}}\r\n\t\t\t<div class=\"rm-grid-item\" style=\"width: {{gridSize}}; height: {{gridSize}}; margin: {{gridMarginY}} {{gridMarginX}};\">\r\n\t\t\t\t{{>content}}\r\n\t\t\t</div>\r\n\t\t{{/if}}\r\n\t{{/gridItems}}\r\n</div>\r\n";
+var style = ".rm-grid-container {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-flex-wrap: wrap;\r\n\t-ms-flex-wrap: wrap;\r\n\tflex-wrap: wrap;\r\n\toverflow-y: auto;\r\n}\r\n.rm-grid-item {\r\n\tdisplay: -webkit-box;\r\n\tdisplay: -webkit-flex;\r\n\tdisplay: -ms-flexbox;\r\n\tdisplay: flex;\r\n\t-webkit-box-align: stretch;\r\n\t-webkit-align-items: stretch;\r\n\t-ms-flex-align: stretch;\r\n\talign-items: stretch;\r\n\t-webkit-box-pack: center;\r\n\t-webkit-justify-content: center;\r\n\t-ms-flex-pack: center;\r\n\tjustify-content: center;\r\n}\r\n.rm-grid-item > * {\r\n\t-webkit-box-flex: 1;\r\n\t-webkit-flex: 1;\r\n\t-ms-flex: 1;\r\n\tflex: 1;\r\n}\r\n";
 
 insert(style);
 
@@ -102,27 +104,51 @@ module.exports = Ractive.extend({
 });
 
 function recalculate() {
-	var size = getSize(this.find(".rm-grid-container"));
-	var itemWidth = size.width / +(this.get("gridColumns"));
-	var itemHeight = size.height / +(this.get("gridRows"));
-	var padding = "0px";
+	// Get raw information about the state
+	var container = this.find(".rm-grid-container");
+	var size = getSize(container);
+	var gridRows = this.get("gridRows");
+	var gridColumns = this.get("gridColumns");
+	var isScrolling = gridRows === "scroll";
 
-	if (itemWidth > itemHeight) {
-		// Will pad on the sides
-		padding = (itemWidth - itemHeight) / 2;
+	// Get certain dimensions
+	var containerWidth = size.width;
+	var containerHeight = size.height;
+	var itemWidth = containerWidth / +(gridColumns);
+	var itemHeight = containerHeight / +(gridRows);
+
+	if (isScrolling) {
+		// Calculate for vertical scrolling
+		var hasScrollbar = container.scrollHeight > container.clientHeight;
+		var gridSize = itemWidth;
+		if (hasScrollbar)
+			gridSize = itemWidth - (getScrollbarWidth() / gridColumns);
+
 		this.set({
-			gridSize: itemHeight + "px",
-			gridMarginY: "0px",
-			gridMarginX: padding + "px"
+			gridSize: gridSize + "px",
+			gridMarginX: "0px",
+			gridMarginY: "0px"
 		});
 	} else {
-		// Will pad on top/bottom
-		padding = (itemHeight - itemWidth) / 2;
-		this.set({
-			gridSize: itemWidth + "px",
-			gridMarginY: padding + "px",
-			gridMarginX: "0px"
-		});
+		// Calculate for fitting perfectly
+		var padding = "0px";
+		if (gridRows === "scroll") {} else if (itemWidth > itemHeight) {
+			// Will pad on the sides
+			padding = (itemWidth - itemHeight) / 2;
+			this.set({
+				gridSize: itemHeight + "px",
+				gridMarginY: "0px",
+				gridMarginX: padding + "px"
+			});
+		} else {
+			// Will pad on top/bottom
+			padding = (itemHeight - itemWidth) / 2;
+			this.set({
+				gridSize: itemWidth + "px",
+				gridMarginY: padding + "px",
+				gridMarginX: "0px"
+			});
+		}
 	}
 }
 
@@ -145,7 +171,7 @@ function listenResize(component) {
 	component.observe("gridClass", listener);
 }
 
-},{"bounding-client-rect":4,"debounce":6,"insert-css":8,"ractive":9}],3:[function(require,module,exports){
+},{"bounding-client-rect":4,"debounce":6,"insert-css":8,"ractive":9,"scrollbar-width":10}],3:[function(require,module,exports){
 "use strict";
 var Ractive = require("ractive");
 
@@ -14709,5 +14735,49 @@ module.exports = function (css, options) {
 	};
 
 }( typeof window !== 'undefined' ? window : this ) );
+
+},{}],10:[function(require,module,exports){
+// Generated by CoffeeScript 1.9.1
+(function() {
+  'use strict';
+  var getScrollbarWidth, scrollbarWidth;
+
+  scrollbarWidth = null;
+
+  getScrollbarWidth = function(recalculate) {
+    var div1, div2;
+    if (recalculate == null) {
+      recalculate = false;
+    }
+    if ((scrollbarWidth != null) && !recalculate) {
+      return scrollbarWidth;
+    }
+    if (document.readyState === 'loading') {
+      return null;
+    }
+    div1 = document.createElement('div');
+    div2 = document.createElement('div');
+    div1.style.width = div2.style.width = div1.style.height = div2.style.height = '100px';
+    div1.style.overflow = 'scroll';
+    div2.style.overflow = 'hidden';
+    document.body.appendChild(div1);
+    document.body.appendChild(div2);
+    scrollbarWidth = Math.abs(div1.scrollHeight - div2.scrollHeight);
+    document.body.removeChild(div1);
+    document.body.removeChild(div2);
+    return scrollbarWidth;
+  };
+
+  if (typeof define === 'function' && define.amd) {
+    define([], function() {
+      return getScrollbarWidth;
+    });
+  } else if (typeof exports !== 'undefined') {
+    module.exports = getScrollbarWidth;
+  } else {
+    this.getScrollbarWidth = getScrollbarWidth;
+  }
+
+}).call(this);
 
 },{}]},{},[1]);
